@@ -1,0 +1,33 @@
+How to Install Minikube:
+
+https://minikube.sigs.k8s.io/docs/drivers/docker/
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64  \
+  && install minikube-linux-amd64 /usr/local/bin/minikube \
+  && minikube version
+
+minikube start --driver=docker --force
+Minikube status
+Kubectl cluster-info
+
+---------------------------------------------------------------
+
+Install Argo CD on Minikube
+https://argo-cd.readthedocs.io/en/stable/getting_started/
+
+
+kubectl create ns argocd
+
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+kubectl get all -n argocd
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+kubectl port-forward svc/argocd-server -n argocd --address 0.0.0.0 8080:443
+
+sudo firewall-cmd --permanent --zone=public --add-port=8080/tcp 
+sudo firewall-cmd --permanent --zone=public --add-port=443/tcp 
+sudo firewall-cmd --reload
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
